@@ -4,6 +4,28 @@
     <meta charset="utf-8">
      <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
     <title>大众看点</title>
+    <style media="screen" style=''>
+      @media only screen and (min-width: 750px) {
+        body {
+            width: 750px;
+        }
+      }
+      @media screen and (min-width:750px) {
+          html {
+              font-size:75px !important
+          }
+      }
+    </style>
+    <script type="text/javascript">
+      //获取屏幕宽度
+      var htmlWidth = document.documentElement.clientWidth || document.body.clientWidth
+      var htmlDom = document.documentElement
+      htmlDom.style.fontSize = htmlWidth / 10 + 'px';
+      window.addEventListener('resize', (e) => {
+  			var htmlWidth = document.documentElement.clientWidth || document.body.clientWidth
+  			htmlDom.style.fontSize = htmlWidth / 10 + 'px';
+		  })
+    </script>
   </head>
   <body>
     <div id="app"></div>

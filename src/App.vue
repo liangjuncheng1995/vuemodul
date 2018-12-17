@@ -1,17 +1,20 @@
 <template>
   <div id="app">
-    <home></home>
+  	<m-header></m-header>
+    <keep-alive include="Home">
+  	  <router-view v-if="$route.meta.keepAlive"></router-view>
+    </keep-alive>
   </div>
 </template>
 
 <script>
-import home from './page/home'
-
+import MHeader from '@/page/m-header/m-header'
 export default {
   name: 'App',
   components: {
-    home
+  	MHeader
   }
+
 }
 </script>
 

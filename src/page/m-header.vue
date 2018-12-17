@@ -40,15 +40,16 @@
 	}
 </script>
 
-<style type="text/css">
+<style lang="scss" scoped="">
+	
 	header {
 	    position: fixed;
 	    z-index: 100;
 	    top: 0;
-	    width: 7.5rem;
-	    height: 37px;
+	    width: px2rem(200px);
+	    height: px2rem(37px);
 	}
-	header .top-menu {
+	/* header .top-menu {
 	    position: relative;
 	    height: 37px;
 	    background-color: #f4f5f6;
@@ -78,5 +79,5 @@
 		 overflow-x: scroll;
 		 margin-right: 40px;
 		 white-space: nowrap;
-	}
+	} */
 </style>
