@@ -2,7 +2,7 @@
   <div id="app">
   	<m-header></m-header>
     <keep-alive include="Home">
-  	  <router-view v-if="$route.meta.keepAlive"></router-view>
+  	  <router-view></router-view>
     </keep-alive>
   </div>
 </template>

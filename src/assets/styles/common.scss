@@ -11,6 +11,9 @@
     html {
         font-size:75px !important
     }
+    .news-list-wrap .news-item a:before, .news-list-wrap .news-item-s2 a:before {
+        width:px2rem(715px) !important;
+    }
 }
 
 @media only screen and (min-width: 750px) {

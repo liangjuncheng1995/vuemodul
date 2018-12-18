@@ -1,21 +1,25 @@
 <template>
 	<header>
 		<section class="top-menu">
-			<div id="J_top_menu" class="top-menu-list" >
-				<!-- <a v-for="item in dataList" href="javascript:;">{{item}}</a> -->
-				<!-- :to="'/home/'+index"> -->
-				<!-- :to="{path:'/home/'+item}" -->
-				<!-- @click.native="getDescribe(item)" -->
-				<router-link v-for="(item,index) of dataList" tag="a" class="tab-item"
+			<div id="J_top_menu" class="top-menu-list">
+				<router-link v-for="(item,index) of dataList" tag="a" @click.native="addClass(index)"  class="tab-item"
 										 :to="`/home/${item}`"
 				>
-		      {{item}}
+					<template v-if="item=='看点'" lang="html">
+					  推荐
+					</template>
+					<template lang="html" v-else=''>
+					  {{item}}
+					</template>
 		    </router-link>
 			</div>
 			<div class="menu-more">
 				<div class="list-shadow">
 				</div>
-				<a href="https://toutiao.eastday.com/subscribe.html?v=161207" class="more-btn"></a>
+				<!-- <a href="https://toutiao.eastday.com/subscribe.html?v=161207" class="more-btn"></a> -->
+				<router-link to="/List" class="more-btn" tag="a">
+					<a href="javascript:;"></a>
+			  </router-link>
 			</div>
 		</section>
 	</header>
@@ -25,7 +29,8 @@
 	export default {
 		data() {
 			return {
-				dataList:[]
+				dataList:[],
+				scrollDivWidth: ''
 			}
 		},
 		methods: {
@@ -40,7 +45,18 @@
 				//   query: {id: id}
 			 // })
 
-			}
+		 },
+		 addClass(index) {
+			 console.log(index)
+			 // console.log(index)
+			 this.scrollDivWidth = document.querySelector(".top-menu-list a").getBoundingClientRect().width;
+			 let odivW = this.scrollDivWidth / 2;
+			 let oNavDiv = document.querySelectorAll(".top-menu-list a");
+			 console.log(oNavDiv.length)
+       let oClienWidth = document.body.clientWidth / 2;
+       document.querySelector(".top-menu-list").scrollLeft = oNavDiv[index].offsetLeft - oClienWidth + odivW;
+		 }
+
 		},
 		mounted() {
 			// 顶部数据的请求

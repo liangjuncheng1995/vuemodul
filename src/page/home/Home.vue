@@ -1,7 +1,7 @@
 <template>
 	<div>
-		<div ref='mescroll' class="mescroll" id='mescroll' style="position:fixed;max-width: 750px;">
-			<div>
+		<div  ref='mescroll' class="mescroll" id='mescroll' >
+			<div v-show='componentshow' style="padding:0 15px;">
 				<div class="news-list-wrap" v-for="item in dataList">
 					<template lang="html" v-if='item.images.length>=3'>
 						<section class="news-item news-item-s2">
@@ -11,11 +11,8 @@
 										<h3>{{item.title}}</h3>
 										<div class="img-wrap " >
 											<div class="img" v-for="itemImage in item.images.slice(0,3)">
-												<!-- :style="{ backgroundImage: 'url(' + itemImage + ')'}" -->
-												<img class="pic" :data-src='itemImage'
-														 src='https://static.dzkandian.com/images/zhanwei.png'
-														 style="transform-origin: 0px 0px 0px; opacity: 1; transform: scale(1, 1);"
-												>
+												<div :imgurl="itemImage" class="pic" style="background-image: url(https://static.dzkandian.com/images/loadwap.png)">
+												</div>
 											</div>
 										</div>
 										<p class="tags clearfix">
@@ -32,9 +29,8 @@
 								:href="item.url" >
 									<div class="news-wrap">
 										<div class="img-wrap " v-for="itemImage in item.images.slice(0,1)">
-											<img class="pic" :data-src='itemImage' src='https://static.dzkandian.com/images/zhanwei.png'
-													 style="transform-origin: 0px 0px 0px; opacity: 1; transform: scale(1, 1);"
-											>
+											<div :imgurl="itemImage" class="pic" style="background-image: url(https://static.dzkandian.com/images/loadwap.png)">
+											</div>
 										</div>
 										<div class="txt-wrap">
 											<h3>{{item.title}}</h3>
@@ -47,7 +43,6 @@
 							</a>
 						</section>
 					</template>
-
 				</div>
 			</div>
 		</div>
@@ -64,7 +59,8 @@
 				type: '',
 				name: '',
 				dataList: [],
-				itemImagelazy: []//懒加载存储图片数据
+				itemImagelazy: [],//懒加载存储图片数据
+				componentshow: false//组件是否展示
 			}
 		},
 		mounted() {
@@ -78,10 +74,6 @@
 			this.getDetailList(type)
 
 
-			//首次进来获取滚动条的位置
-			// this.handleScroll()
-			//监听滚动条
-			window.addEventListener('scroll', this.handleScroll)
 
 			//下拉加载初始化
 			let self = this
@@ -89,17 +81,31 @@
         down: {
           auto: false, //是否在初始化完毕之后自动执行下拉回调callback; 默认true
           callback: self.downCallback, //下拉刷新的回调
+					lazyLoad: {
+						use: true,
+						attr: 'imgurl', // 网络地址的属性名 (图片加载成功会移除该属性): <img imgurl='网络图  src='占位图''/>
+		        // showClass: '', // 图片加载成功的显示动画: 渐变显示,参见mescroll.css
+		        delay: 0, // 列表滚动的过程中每500ms检查一次图片是否在可视区域,如果在可视区域则加载图片
+		        offset: 0 // 超出可视区域200px的图片仍可触发懒加载,目的是提前加载部分图片
+					}
         },
-        // up: {
-        //   auto: false, //初始化完毕,是否自动触发上拉加载的回调
-        //   isBoth: false, //上拉加载时,如果滑动到列表顶部是否可以同时触发下拉刷新;默认false,两者不可同时触发; 这里为了演示改为true,不必等列表加载完毕才可下拉;
-        //   isBounce: false, //此处禁止ios回弹,解析(务必认真阅读,特别是最后一点): http://www.mescroll.com/qa.html#q10
-        //   callback: self.upCallback, //上拉加载的回调
-        //   // toTop:{ //配置回到顶部按钮
-        //   // 	src : "https://4g.dzkandian.com/html/a/mescroll-totop.png", //默认滚动到1000px显示,可配置offset修改
-        //   // 	//offset : 1000
-        //   // }
-        // }
+        up: {
+          auto: false, //初始化完毕,是否自动触发上拉加载的回调
+          isBoth: false, //上拉加载时,如果滑动到列表顶部是否可以同时触发下拉刷新;默认false,两者不可同时触发; 这里为了演示改为true,不必等列表加载完毕才可下拉;
+          isBounce: true, //此处禁止ios回弹,解析(务必认真阅读,特别是最后一点): http://www.mescroll.com/qa.html#q10
+          callback: self.upCallback, //上拉加载的回调
+          toTop:{ //配置回到顶部按钮
+          	src : "https://4g.dzkandian.com/html/a/mescroll-totop.png", //默认滚动到1000px显示,可配置offset修改
+          	//offset : 1000
+          },
+					lazyLoad: {
+						use: true,
+						attr: 'imgurl', // 网络地址的属性名 (图片加载成功会移除该属性): <img imgurl='网络图  src='占位图''/>
+		        // showClass: '', // 图片加载成功的显示动画: 渐变显示,参见mescroll.css
+		        delay: 0, // 列表滚动的过程中每500ms检查一次图片是否在可视区域,如果在可视区域则加载图片
+		        offset: 0 // 超出可视区域200px的图片仍可触发懒加载,目的是提前加载部分图片
+					}
+        }
       });
 
 
@@ -108,12 +114,14 @@
 		methods: {
 			downCallback() { //下拉刷新的回调
         var that = this
+				this.componentshow = false
+				document.querySelector(".mescroll-upwarp").style.display = 'none'
         setTimeout(function () {
           console.log("下拉刷新开")
 					let type = that.$route.params.id
 					let beforeId = that.dataList[that.dataList.length - 1].id
 					that.getDetailLists(beforeId,type)
-        }, 500)
+        }, 200)
       },
 			upCallback(page) {
 				let type = this.$route.params.id
@@ -127,36 +135,11 @@
 					},
 					method: 'get'
 				}).then(res => {
-					// that.dataList	= res.data
 					that.dataList = that.dataList.concat(res.data)
-	        //     that.mescroll.endSuccess(response.data.data.length);
 					that.loadingDialog("hide");
 					that.mescroll.endSuccess(); //无参
-					// that.$nextTick(function(){  //页面加载完成后执行
-          //   that.handleScroll()
-          // })
 				})
-
-
-        // setTimeout(function () {
-        //   that.$axios.get(url, {
-        //     params: {
-        //       type,
-        //       beforeId
-        //     }
-        //   })
-        //   .then(function (response) {
-        //     // console.log("上拉加载后请求的数据:" + JSON.stringify(response.data.data) )
-        //     console.log("上拉加载后请求的数据:" + response.data.data)
-        //     that.listdata = that.listdata.concat(response.data.data)
-        //     that.mescroll.endSuccess(response.data.data.length);
-				//
-        //     // that._checkMore(response.data.data)
-        //   })
-        // }, 0)
       },
-
-
 			getDetailList(type) {
 				let that = this;
 				//数据请求 获取第一条的数据
@@ -168,13 +151,12 @@
 					method: 'get'
 				}).then(res => {
 					that.getDetailLists(res.data[0].id,type)
-					// console.log("获取的第一条数据:")
-					// console.log(res.data[0].id)
 				})
 			},
 			//获取前十条的数据
 			getDetailLists(id,type) {
 				let that = this
+				let kongArr = []
 				this.$ajax({
 					url: '/a/news.html',
 					params: {
@@ -183,27 +165,16 @@
 					},
 					method: 'get'
 				}).then(res => {
+					that.dataList = kongArr
 					that.dataList	= res.data
 					that.loadingDialog("hide");
+					// setTimeout(function() {
+						that.componentshow = true
+						document.querySelector(".mescroll-upwarp").style.display = 'none'
+					// },1000)
 					that.mescroll.endSuccess(); //无参
-					that.$nextTick(function(){  //页面加载完成后执行
-            that.handleScroll()
-          })
 				})
 			},
-			handleScroll () {//首次进入,或切换数据的时候监听滚动条的位置
-				let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-				// console.log(scrollTop)
-				let imgs = document.getElementsByClassName('pic');
-				// console.log(imgs.length)
-				let imagelazy = []
-				for(let i=0;i<imgs.length;i++) {
-					if(imgs[i].y < window.innerHeight + scrollTop) {
-						let currentImage = imgs[i].getAttribute("data-src")
-						imgs[i].style.backgroundImage="url("+currentImage+")";
-					}
-				}
-			}
 		},
 		watch:{
       // 监听路由变化-用于非首次加载
@@ -211,7 +182,10 @@
 				this.type = this.$route.params.id
 				// console.log(this.type)
 				this.loadingDialog("show");
+				this.componentshow = false
+
 				this.getDetailList(this.type)
+				this.mescroll.scrollTo(0, 0)
       },
     }
 
@@ -224,14 +198,28 @@
 
 		.news-list-wrap {
 			background-color: #fff;
+			position: relative;
+
 			.news-item , .news-item-s2{
 				height: auto;
+				&:before {
+					content: '';
+					position: absolute;
+					width: 200%;
+					height: 1px;
+					bottom: 0;
+					left: 0;
+					border-bottom: 1px solid #e6e6e6;
+					transform-origin: 0 0;
+					transform: scale(0.5, 0.5);
+					box-sizing: border-box;
+				}
 				a {
 					display: block;
 			    padding: 10px 0;
-			    margin: 0 15px;
-			    border-bottom: 1px solid #f5f5f5;
+			    // border-bottom: 1px solid #f5f5f5;
 			    color: #333;
+
 					.news-wrap {
 						position: relative;
     				min-height: 115px;
@@ -253,7 +241,7 @@
 							.img	{
 								width: 33.33%;
     						padding-right: 2px;
-								img {
+								div {
 									width: 100%;
 
 									background-color: rgba(150,150,150,.1);
@@ -323,7 +311,7 @@
 							width: 33%;
 							height: px2rem(75px);
 							margin-right: 10px;
-							img {
+							div {
 								width: 100%;
 								background-color: rgba(150,150,150,.1);
 								// background-image: url(//mini.eastday.com/toutiaoh5/img/img_preview.png);
@@ -337,6 +325,13 @@
 				}
 			}
 
+		}
+		.mescroll {
+			position: fixed;
+			top: 44px;
+			bottom: 0;
+			height: auto; /*如设置bottom:50px,则需height:auto才能生效*/
+			max-width: 750px;
 		}
 
 
